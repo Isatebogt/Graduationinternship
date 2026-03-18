@@ -1,9 +1,11 @@
 library(shiny)
 library(ggiraph)
 library(bslib)
+library(plotly)
 
 source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/loaddata.R")
 source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/GroupedAbundancePlot.R")
+source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/explorationPCA.R")
 
 ui <- page_navbar(
   title = "Microbiota analysis",
@@ -21,7 +23,7 @@ ui <- page_navbar(
   
   nav_panel(
     title = "PCA",
-    p("test")
+    plotlyOutput(outputId = "PCA_plot")
   ),
   
   nav_panel(
@@ -49,6 +51,13 @@ server <- function(input, output, session){
   output$species_plot <- renderGirafe({
     req(metadata_df())
     make_species_plot(metadata_df())
+  })
+  
+  output$PCA_plot <- renderPlotly({
+    req(metadata_df())
+    makepca(metadata_df())
+    
+    
   })
   
 }
