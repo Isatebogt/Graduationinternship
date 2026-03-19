@@ -1,3 +1,4 @@
+
 library(shiny)
 library(ggiraph)
 library(bslib)
@@ -14,6 +15,8 @@ ui <- page_navbar(
   
   nav_panel(
     title = "Species composition",
+    
+    actionButton("average","Average"),
     
     fileInput("file1", "Choose a CSV file"),
     
@@ -36,30 +39,33 @@ ui <- page_navbar(
 
 
 server <- function(input, output, session){
+
   
-
-  metadata_df <- reactive({
-    req(input$file1)   # wait until file uploaded
-    load_species_data(input$file1$datapath)
+  average <- reactiveVal(FALSE)
+  
+  metadata_df <- eventReactive(input$file1, {
+    df <- load_species_data(input$file1$datapath)
   })
-
-  output$file1_contents <- renderPrint({
-    req(input$file1)
-    input$file1
+  
+  observeEvent(input$average, { 
+    average(!average())
   })
+  
+  species_plot_obj <- reactive({
+    req(metadata_df())
+    make_species_plot(metadata_df(), average())
+  })
+  
+  
   
   output$species_plot <- renderGirafe({
-    req(metadata_df())
-    make_species_plot(metadata_df())
+    species_plot_obj()
   })
   
   output$PCA_plot <- renderPlotly({
     req(metadata_df())
     makepca(metadata_df())
-    
-    
   })
-  
 }
 
 shinyApp(ui, server)
