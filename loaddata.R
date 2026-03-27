@@ -14,3 +14,13 @@ load_species_data <- function(path){
   
   return(df)
 }
+
+load_sep_file <- function(path){
+  
+  df <- read.delim(path, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+  
+  
+  return(df)
+  
+
+}
