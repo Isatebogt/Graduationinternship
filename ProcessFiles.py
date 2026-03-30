@@ -42,7 +42,7 @@ def filter_taxon(df, taxon, taxon_col=1):
         match = re.search(pattern, str(row.iloc[taxon_col]))
 
         if match:
-            new_data.append(match.group(0))
+            new_data.append(match.group(0).strip().replace(" ", "_"))
         else:
             new_data.append(None)
 
@@ -92,11 +92,14 @@ def top_n_taxa(df_long, n=10):
 def add_metadata(df_top, metadata_df):
     metadata_df = metadata_df.rename(columns = {"Sample-id":"sample","DESCRIPTION":"sample","GenotypeIL22":"GT","Age":"Day" })
     metadata_df['sample'] = metadata_df['sample'].str.split(".").str[0]
+    metadata_df['GT'] = metadata_df['GT'].str.strip().str.upper()
     # get the only the usefull
 
     #df_final = pd.merge(df_top, metadata_df, on='sample', how='left')
     metadata_df["Day"] = metadata_df["Day"].str.extract(r"(\d+)")
     df_final = pd.merge(df_top, metadata_df[['sample', 'Day', 'GT']], on='sample', how='left')
+    df_final = df_final.sort_values(by=['Day', 'GT'], ascending=[True, False])
+
     return df_final
 
 def process_taxa(df, taxon, output_dir, metadata_df):
@@ -114,8 +117,8 @@ def process_taxa(df, taxon, output_dir, metadata_df):
 
 
 def main():
-    abundance = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/cxcl8a/biotaviz_clean_relative.txt")
-    metadata = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/cxcl8a/for_canoco.xlsx")
+    abundance = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/IL-22/biotaviz_clean_relative.txt")
+    metadata = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/IL-22/for_canoco.xlsx")
 
     namedocument = input("dataname: cxcl8a or IL-22")
 
@@ -128,6 +131,7 @@ def main():
 
     for taxon in taxa_levels:
          df_top = process_taxa(df, taxon, output_dir, metadata_df)
+         df_top = df_top.apply(lambda col: col.str.strip() if col.dtype == 'object' else col)
          df_top.to_csv(output_dir / f"{taxon}_table.csv", index=False)
 
 
