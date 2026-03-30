@@ -34,7 +34,7 @@ def filter_taxon(df, taxon, taxon_col=1):
 
     df_taxon = df[df.iloc[:, taxon_col].str.startswith(taxon, na=False)]
 
-    pattern = rf"(?<={taxon} - )[\w-]+"
+    pattern = rf"(?<={taxon} - ).+"
 
     new_data = []
 
@@ -114,12 +114,12 @@ def process_taxa(df, taxon, output_dir, metadata_df):
 
 
 def main():
-    abundance = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/IL-22/biotaviz_clean_absolute.txt")
-    metadata = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/IL-22/for_Canoco.xlsx")
+    abundance = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/cxcl8a/biotaviz_clean_relative.txt")
+    metadata = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/inputdir/cxcl8a/for_canoco.xlsx")
 
     namedocument = input("dataname: cxcl8a or IL-22")
 
-    output_dir = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/outputdir/"+ namedocument + "/")
+    output_dir = Path("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/outputdir/"+ namedocument +"/check/")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     df, metadata_df = open_files(abundance, metadata)
