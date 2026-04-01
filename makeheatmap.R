@@ -5,6 +5,7 @@ library(dplyr)
 library(tibble)
 library(ggplot2)
 library(reshape2)
+library(ggiraph)
 
 
 # Prepare the data for the plotting. 
@@ -80,8 +81,12 @@ make_heatmap <- function(prepped) {
 # Makes boxplot of bray curtis dissimilarity grouped on GT. 
 make_boxplot <- function(prepped) {
   
+  
   mat <- prepped$mat
   sample_meta <- prepped$sample_meta
+  
+  View(mat)
+  View(sample_meta)
   
   sample_meta <- tibble::rownames_to_column(sample_meta, var="sample")
   
@@ -90,12 +95,14 @@ make_boxplot <- function(prepped) {
   
   
   # Match Var 1 from matrix against sample metadata
-  newframe1 <- left_join(test, sample_meta %>% select(sample, GT_var1 = GT), 
+  newframe1 <- left_join(test, sample_meta %>% select(sample, GT_var1 = GT, Day_var1 = Day), 
                          by = c("Var1" = "sample"))
   
   # Match Var2 from matrix to sample, bring in GT as GT_var2
-  newframe2 <- left_join(newframe1, sample_meta %>% select(sample, GT_var2 = GT), 
+  newframe2 <- left_join(newframe1, sample_meta %>% select(sample, GT_var2 = GT, Day_var2  = Day), 
                          by = c("Var2" = "sample"))
+  
+  Days_for_dropdown <- sort(unique(newframe2$Day_var2))
   
   # combine the GT values 
   newframe2$combined <- paste(newframe2$GT_var1, "-", newframe2$GT_var2)
@@ -104,12 +111,30 @@ make_boxplot <- function(prepped) {
   newframe2 <- filter(newframe2, GT_var1 != "MOCK", GT_var2 != "MOCK")
   
   
-  p <- ggplot(newframe2, aes(x=combined, y=value)) + 
-    geom_boxplot(outlier.colour="red", outlier.shape=8,
-                 outlier.size=4)
+  p <- ggplot(newframe2) + 
+    geom_boxplot_interactive(aes(
+      x = combined,
+      y = value,
+      fill = combined,
+      data_id = combined,
+      tooltip = after_stat({
+        paste0(
+          "class: ",
+          .data$fill,
+          "\nQ1: ",
+          prettyNum(.data$lower),
+          "\nQ3: ",
+          prettyNum(.data$upper),
+          "\nmedian: ",
+          prettyNum(.data$middle)
+        )
+      })
+    ))
   
-  
-  girafe(ggobj = p)
+  return(list(
+    plot = girafe(ggobj = p),
+    days = Days_for_dropdown
+  ))
   
   
 }
