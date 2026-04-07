@@ -3,12 +3,14 @@ library(ggiraph)
 library(bslib)
 library(plotly)
 library(shinyBS)
+options(shiny.autoreload = TRUE)
 
 
 # Call other files to use them in APP script
 source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/loaddata.R")
 source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/GroupedAbundancePlot.R")
 source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/explorationPCA.R")
+source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/RDAplot.R")
 source("C:/Users/isate/OneDrive - Wageningen University & Research/HMI/App-1/makeheatmap.R")
 
 # User interface of shiny app
@@ -53,15 +55,20 @@ ui <- page_navbar(
                           p("Species dataset 2"),
                           girafeOutput("species_plot2", width = "100%",
                                        height = "350px"))
-        )    # closes accordion
-      )      # closes column
-    )        # closes fluidRow
-  ),         # closes nav_panel "Species composition"  <-- THIS WAS MISSING
+        )   
+      )     
+    )        
+  ),        
   
   nav_panel(
     title = "PCA",
     plotlyOutput("PCA_plot")
   ),
+  
+ nav_panel(
+   title = "RDA",
+   plotlyOutput("RDA_plot")
+   ),
   
   nav_panel(
     title = "Beta diversity",
@@ -75,10 +82,10 @@ ui <- page_navbar(
                        accordion_panel("panel 4", title = "boxplot",
                                        selectInput("dropdown", "Select day", choices = c("")),
                                        girafeOutput("boxplot",height = "600px", width = "80%"))
-             )    # closes accordion
-      )           # closes column
-    )             # closes fluidRow
-  ),              # closes nav_panel "helooooo"
+             )    
+      )          
+    )         
+  ),             
   
   nav_spacer()
 )     
@@ -144,6 +151,11 @@ server <- function(input, output, session) {
     makepca(metadata_df1())
   })
   
+  output$RDA_plot <- renderPlotly({
+    req(metadata_df1())
+    makeRDA(metadata_df1())
+    })
+  
   #------------------------
   # Heatmap beta diversity
   # -----------------------
@@ -173,11 +185,21 @@ server <- function(input, output, session) {
     boxplot_data()$plot
   })
   
-  # use days elsewhere like:
-  observe({
-    updateSelectInput(session, "dropdown", choices = boxplot_data()$days)
+  observeEvent(boxplot_data(), {
+    days <- as.character(boxplot_data()$days)
+    choices <- c("All days" = "all", setNames(days, days))
+    updateSelectInput(session, "dropdown", choices = choices, selected = "all")
   })
-
+  
+  selected_boxplot_data <- reactive({
+    req(prepped())
+    day_filter <- if (input$dropdown == "all") NULL else input$dropdown
+    make_boxplot(prepped(),day_filter)
+  })
+  
+  output$boxplot <- renderGirafe({
+    selected_boxplot_data()$plot
+  })
   
   
 }
