@@ -1,50 +1,48 @@
+# function: load files to use for the shiny app
 
-# Load data from the CSV files
-load_species_data <- function(path){
-  df <- read.csv(
-    path,
-    stringsAsFactors = FALSE,
-    check.names = FALSE      
+load_species_data <- function(path) {
+  # check if file is csv
+  
+  if (tolower(tools::file_ext(path)) != "csv") {
+    stop("Expected a CSV file, got: ", tools::file_ext(path), " please provide a .csv file")
+  }
+  
+  
+  df <- tryCatch(
+    read.csv(path, stringsAsFactors = FALSE, check.names = FALSE),
+    error = function(e) stop("Failed to read CSV: ", e$message)
   )
   
-  # Make sure that Age and Genotypeil22 is renamed to GT and DAY, 
-  # to correctly make the plots. 
   df <- df %>%
     dplyr::rename(any_of(c(Day = "Age", GT = "GenotypeIL22")))
   
-  # Make sure day is an integer value 
-  df$Day <- as.integer(df$Day)
+  # warn if expected columns are still missing after rename
+  required_cols <- c("Day", "GT", "sample", "classid", "percentage")
+  missing_cols  <- setdiff(required_cols, names(df))
+  if (length(missing_cols) > 0) {
+    warning("Loaded file is missing expected columns: ", 
+            paste(missing_cols, collapse = ", "))
+  }
+  
+  df$Day <- suppressWarnings(as.integer(df$Day))
+  if (all(is.na(df$Day))) warning("Day column could not be converted
+                                  to integer")
   
   return(df)
 }
 
-# Load data from the bray curtis file. 
-load_sep_file <- function(path){
+load_sep_file <- function(path) {
+  if (tolower(tools::file_ext(path)) != "txt") {
+    stop("Expected a CSV file, got:", tools::file_ext(path), " please provide a .txt file")
+  }
   
-  df <- read.delim(path, sep = '\t', stringsAsFactors = FALSE,
-                   check.names = FALSE)
   
+  df <- tryCatch(
+    read.delim(path, sep = "\t", stringsAsFactors = FALSE, check.names = FALSE),
+    error = function(e) stop("Failed to read file: ", e$message)
+  )
+  
+  if (nrow(df) == 0) warning("File loaded but contains no rows: ", path)
   
   return(df)
-  
-
-}
-
-load_compare_file <- function(path1, path2) {
-  
-  # Load both files using the existing function so renaming/typing is applied
-  df1 <- load_species_data(path1)
-  df2 <- load_species_data(path2)
-  
-  # Add a source column so you can distinguish them in the PCA later
-  df1$source <- "Dataset 1"
-  df2$source <- "Dataset 2"
-  
-  # Bind only the columns that exist in both datasets
-  shared_cols <- intersect(names(df1), names(df2))
-  combined <- dplyr::bind_rows(df1[, shared_cols], df2[, shared_cols])
-  
-  View(combined)
-  
-  return(combined)
 }
