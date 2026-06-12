@@ -46,6 +46,9 @@ make_species_plot <- function(metadata_df, average){
     data_id  <- metadata_df$bar_id
   }
   
+  # Only show legend if its file has 10 taxa to show, otherwise hovering can 
+  # give more information
+  n_taxa <- length(unique(metadata_df$classid))
   # make the abundance plot
   p <- ggplot(metadata_df, aes(x = .data[[x_var]], y = .data[[y_var]])) +
     geom_bar_interactive(
@@ -75,7 +78,7 @@ make_species_plot <- function(metadata_df, average){
       panel.background   = element_rect(fill = "white", color = NA),
       axis.text.x        = element_blank(),
       axis.ticks.x       = element_blank(),
-      legend.position    = "right"
+      legend.position = if (n_taxa > 10) "none" else "right"
     )
   
   
@@ -93,4 +96,3 @@ make_species_plot <- function(metadata_df, average){
   return(g)
   
 }
-
