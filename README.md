@@ -57,9 +57,9 @@ The application was developed to facilitate microbiota data exploration.
 | RDAplot.R            | Functions for RDA analysis and plotting            |
 | HeatmapBoxplotBeta.R | Functions for beta diversity heatmaps and boxplots |
 
-### Input file 
+## Input file 
 
-## Input file composition and ordination plots 
+### Input file composition and ordination plots 
 
 The input file used to generate the composition and ordination plots should contain the following columns:
 
@@ -78,11 +78,7 @@ GT: genotype
 
 This file can also be generated using the processfile.py script, which converts a relative abundance table exported from QIIME into the required format for each taxonomic level (e.g., phylum, class, order, family, genus, and species).
 
-## Input file beta diversity heatmap and boxplot
-
-### Beta Diversity Heatmap Input File
-
-### Beta Diversity Heatmap Input File
+### Input file beta diversity heatmap and boxplot
 
 The beta diversity heatmap requires a Bray-Curtis matrix file. This is a table containing pairwise Bray-Curtis values between all samples.
 
