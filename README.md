@@ -100,33 +100,29 @@ This file can be generated using QIIME 2, R (`vegan`), or other microbiome analy
 
 The following R packages are required:
 
-```R
-library(shiny)
-library(ggiraph)
-library(bslib)
-library(plotly)
-library(shinyjs)
-library(shinyBS)
-library(vegan)
-library(ggplot2)
-library(tidyr)
-library(tidyverse)
-library(readxl)
-library(svglite)
-library(dplyr)
-library(ggh4x)
-library(heatmaply)
-library(RColorBrewer)
-library(tibble)
-library(reshape2)
+| Package      | Version | Purpose                   |
+| ------------ | ------- | ------------------------- |
+| shiny        | 1.13.0  | Shiny app                 |
+| bslib        | 0.10.0  | Style Shiny app           |
+| shinyBS      | 0.65.0  | Style Shiny app           |
+| ggiraph      | 0.9.6   | Interactive visualisation |
+| plotly       | 4.12.0  | Interactive visualisation |
+| shinyjs      | 2.1.0   | Shiny app functionality   |
+| dplyr        | 1.2.1   | Data processing           |
+| tidyr        | 1.3.2   | Data processing           |
+| tidyverse    | 2.0.0   | Data toolkit              |
+| tibble       | 3.3.1   | Data processing           |
+| stringr      | 1.6.0   | Data processing           |
+| forcats      | 1.0.1   | Data processing           |
+| lubridate    | 1.9.5   | Date handling             |
+| vegan        | 2.7-3   | RDA/PCA                   |
+| permute      | 0.9-10  | Statistical methods       |
+| ggplot2      | 4.0.3   | Visualisation             |
+| ggh4x        | 0.3.1   | Plotting                  |
+| heatmaply    | 1.6.0   | Heatmaps                  |
+| RColorBrewer | 1.1-3   | Color                     |
 
 ## Running the App
-
-Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/microbiota-analysis.git
-```
 
 Open R or RStudio and run:
 
